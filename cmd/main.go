@@ -19,10 +19,17 @@ func main() {
 		output, err := convert.ConvertToASCII(*filepath, *width, *mode)
 		if err != nil {
 			// Handle error
+			io.WriteString(os.Stderr, err.Error())
 		}
 		io.WriteString(os.Stdout, output)
-	case "hafblock":
-		io.WriteString(os.Stdout, "Not implemented yet\n")
+	case "halfblock":
+		output, err := convert.ConvertToHalfBlock(*filepath, *width, *mode)
+		if err != nil {
+			// Handle error
+			io.WriteString(os.Stderr, err.Error())
+		}
+		io.WriteString(os.Stdout, output)
+
 	default:
 		io.WriteString(os.Stdout, "Unknown mode\n")
 	}
