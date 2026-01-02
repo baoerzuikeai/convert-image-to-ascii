@@ -4,12 +4,14 @@ import (
 	"image"
 	"image/color"
 	_ "image/jpeg"
+	_ "image/png"
 	"os"
+	"strconv"
 
 	"github.com/nfnt/resize"
 )
 
-func ConvertToASCII(input string, width uint) (string, error) {
+func ConvertToASCII(input string, width uint, mode string) (string, error) {
 	file, err := os.Open(input)
 	if err != nil {
 		return "", err
@@ -32,7 +34,15 @@ func ConvertToASCII(input string, width uint) (string, error) {
 		for x := 0; x < int(width); x++ {
 			grayColor := color.GrayModel.Convert(resizedImg.At(x, y)).(color.Gray)
 			index := int(grayColor.Y) * len(colors) / 256
-			output += colors[index]
+			if mode == "gray" {
+				output += colors[index]
+			} else if mode == "color" {
+				r, g, b, _ := resizedImg.At(x, y).RGBA()
+				strr := strconv.Itoa(int(r >> 8))
+				strg := strconv.Itoa(int(g >> 8))
+				strb := strconv.Itoa(int(b >> 8))
+				output += "\x1b[38;2;" + strr + ";" + strg + ";" + strb + "m" + colors[index] + "\x1b[0m"
+			}
 		}
 		output += "\n"
 	}
